@@ -53,11 +53,15 @@ let
       sleep 1
     done
 
-    ${updateConfig} core.mailerSettings.emailAgent ""
+    ${scriptResetEmailAgent}
 
     echo -e "Startup completed"
 
     sleep infinity
+  '';
+
+  scriptResetEmailAgent = pkgs.writeScript "scriptResetEmailAgent" ''
+    ${updateConfig} core.mailerSettings.emailAgent ""
   '';
 
   updateConfig = pkgs.writeScript "updateConfig" ''
@@ -202,6 +206,9 @@ let
         LC_ALL=C sed -i "" 's/NO_AUTO_CREATE_USER//' "$SQL_FILE"
 
         MYSQL_PWD="" ${config.services.mysql.package}/bin/mysql -u root shopware -f < "$SQL_FILE"
+
+        ${scriptResetEmailAgent}
+
         echo "Finished!"
     '';
 in {
