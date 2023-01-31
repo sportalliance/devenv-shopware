@@ -242,7 +242,7 @@ in {
   services.caddy.config = "{
     auto_https disable_redirects
   }";
-  services.caddy.virtualHosts."127.0.0.1:8000" = {
+  services.caddy.virtualHosts."127.0.0.1:8000" = lib.mkDefault {
     extraConfig = ''
       @default {
         not path /theme/* /media/* /thumbnail/* /bundles/* /css/* /fonts/* /js/* /recovery/* /sitemap/*
