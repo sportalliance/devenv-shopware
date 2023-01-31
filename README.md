@@ -31,7 +31,7 @@ Add the following files to the project .gitignore file:
 ### Different PHP versions
 
 If you want to use a specific PHP version, you can set the following versions 
-in your project devenv.nix file. The php.ini configuration is >php80 specific
+in your project `devenv.nix` file. The php.ini configuration is >php80 specific
 and needs to be adjusted when using a lower version. 
 
 - php56
@@ -43,6 +43,15 @@ and needs to be adjusted when using a lower version.
 - php80
 - php81
 - php82
+
+### Import database dump by command
+
+You can specify a file via `env.DATABASE_DUMP_URL` in your `devenv.nix` file.  
+Running script `importdb` will then download, extract (if needed) and import the file into the database.  
+Supported files:
+- *.sql
+- *.sql.gz
+- *.sql.zip
 
 ## License
 MIT
