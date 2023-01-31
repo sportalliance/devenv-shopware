@@ -268,6 +268,7 @@ in {
   env.CYPRESS_baseUrl = lib.mkDefault "https://127.0.0.1:8000";
   env.PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = true;
   env.DISABLE_ADMIN_COMPILATION_TYPECHECK = true;
+  env.DATABASE_DUMP_URL = lib.mkDefault "";
 
   # Processes
   processes.entryscript.exec = "${entryScript}";
@@ -285,5 +286,56 @@ in {
 
   scripts.debug.exec = ''
     XDEBUG_SESSION=1 ${phpXdebug}/bin/php "$@"
+  '';
+
+  scripts.importdb.exec = ''
+    if [[ "${config.env.DATABASE_DUMP_URL}" == "" ]]; then
+      echo "Please setup ENV DATABASE_DUMP_URL"
+      exit
+    fi
+
+    echo "Are you sure you want to download the file and overwritting database shopware with its data (y/n)?"
+    read answer
+
+    if [[ "$answer" != "y" ]]; then
+        echo "Allright, we will stop here."
+        exit
+    fi
+
+    BASENAME=$(basename -- ${config.env.DATABASE_DUMP_URL})
+    TARGETFOLDER="${config.env.DEVENV_STATE}/importdatabase_dump"
+
+    rm -rf "$TARGETFOLDER"
+
+    set -e
+
+    if [[ "$BASENAME" == *.sql ]]; then
+        curl --create-dirs "${config.env.DATABASE_DUMP_URL}" --output "$TARGETFOLDER/dump.sql"
+    elif [[ "$BASENAME" == *.sql.gz ]]; then
+        curl --create-dirs "${config.env.DATABASE_DUMP_URL}" --output "$TARGETFOLDER/latest.sql.gz"
+        gunzip -c "$TARGETFOLDER/latest.sql.gz" > "$TARGETFOLDER/dump.sql"
+    elif [[ "$BASENAME" == *.sql.zip ]]; then
+        curl --create-dirs "${config.env.DATABASE_DUMP_URL}" --output "$TARGETFOLDER/latest.sql.zip"
+        unzip -j -o "$TARGETFOLDER/latest.sql.zip" '*.sql' -d "$TARGETFOLDER"
+    else
+        echo "unsupported file type"
+        exit
+    fi
+
+    rm -f "$TARGETFOLDER/latest.sql.zip"
+
+    SQLFILE=$(find "$TARGETFOLDER" -name "*.sql" | head -n 1)
+
+    if [[ "$SQLFILE" == "" ]]; then
+        echo "no sql file found"
+        exit
+    fi
+
+    #this seems MAC related?!
+    LC_ALL=C sed -i "" "s/DEFINER=[^*]*\*/\*/g" "$SQLFILE"
+    LC_ALL=C sed -i "" 's/NO_AUTO_CREATE_USER//' "$SQLFILE"
+
+    MYSQL_PWD="" ${config.services.mysql.package}/bin/mysql -u root shopware -f < "$SQLFILE"
+    echo "Finished!"
   '';
 }
