@@ -151,9 +151,14 @@ let
   '';
 
   importdbHelper = pkgs.writeScript "importdb" ''
-    if [[ "${config.env.DATABASE_DUMP_URL}" == "" ]]; then
-          echo "Please setup ENV DATABASE_DUMP_URL"
-          exit
+        if [[ "${config.env.DATABASE_DUMP_URL}" == "" ]]; then
+            echo "Please setup ENV DATABASE_DUMP_URL"
+            exit
+        fi
+
+        if ! ${config.services.mysql.package}/bin/mysqladmin ping > /dev/null 2>&1; then
+            echo "Mysql is dead or has gone away! devenv up?"
+            exit
         fi
 
         echo "Are you sure you want to download the file and overwritting database shopware with its data (y/n)?"
