@@ -1,7 +1,7 @@
 { pkgs, config, inputs, lib, ... }:
 
 let
-  cfg = config.kellerkinder;
+  cfg = config.sportalliance;
 
   phpConfig = lib.strings.concatStrings [''
     memory_limit = 2G
@@ -176,11 +176,11 @@ let
     echo "Finished!"
   '';
 in {
-  options.kellerkinder = {
+  options.sportalliance = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = true;
-      description = "Enables the Kellerkinder devenv environment";
+      description = "Enables the devenv environment";
     };
 
     phpVersion = lib.mkOption {
