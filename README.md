@@ -36,6 +36,16 @@ Allows to define the used PHP Version. For supported versions see [Different PHP
 kellerkinder.phpVersion = "php80";
 ```
 
+### kellerkinder.systemConfig
+Define shopware systemconfig values.
+
+*_Example_*
+```
+kellerkinder.systemConfig = {
+    "foo.bar.testString" = "false";
+};
+```
+
 ### kellerkinder.additionalPhpConfig
 Define additional php.ini settings which are used for php-fpm and php-cli.
 
@@ -54,6 +64,26 @@ Define additional PHP extensions that are included in php-fpm and php-cli.
 kellerkinder.additionalPhpExtensions = [
    "mailparse"
 ];
+```
+
+### kellerkinder.additionalServerAlias
+Define additional server aliases that are added to caddy.
+
+*_Example_*
+```
+kellerkinder.additionalServerAlias = [
+   "example.com"
+];
+```
+
+### kellerkinder.additionalVhostConfig
+Define additional vhost configurations that are appended to the general vhost configuration.
+
+*_Example_*
+```
+kellerkinder.additionalVhostConfig = ''
+  tls internal
+'';
 ```
 
 ### kellerkinder.enableRabbitMq
