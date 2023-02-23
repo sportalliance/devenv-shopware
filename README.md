@@ -28,82 +28,82 @@ Add the following files to the project .gitignore file:
 
 ## Options
 
-### kellerkinder.phpVersion
+### sportalliance.phpVersion
 Allows to define the used PHP Version. For supported versions see [Different PHP versions](#different-php-versions)
 
 *_Example_*
 ```
-kellerkinder.phpVersion = "php80";
+sportalliance.phpVersion = "php80";
 ```
 
-### kellerkinder.systemConfig
+### sportalliance.systemConfig
 Define shopware systemconfig values.
 
 *_Example_*
 ```
-kellerkinder.systemConfig = {
+sportalliance.systemConfig = {
     "foo.bar.testString" = "false";
 };
 ```
 
-### kellerkinder.additionalPhpConfig
+### sportalliance.additionalPhpConfig
 Define additional php.ini settings which are used for php-fpm and php-cli.
 
 *_Example_*
 ```
-kellerkinder.additionalPhpConfig = ''
+sportalliance.additionalPhpConfig = ''
     memory_limit = 200M
 '';
 ```
 
-### kellerkinder.additionalPhpExtensions
+### sportalliance.additionalPhpExtensions
 Define additional PHP extensions that are included in php-fpm and php-cli.
 
 *_Example_*
 ```
-kellerkinder.additionalPhpExtensions = [
+sportalliance.additionalPhpExtensions = [
    "mailparse"
 ];
 ```
 
-### kellerkinder.additionalServerAlias
+### sportalliance.additionalServerAlias
 Define additional server aliases that are added to caddy.
 
 *_Example_*
 ```
-kellerkinder.additionalServerAlias = [
+sportalliance.additionalServerAlias = [
    "example.com"
 ];
 ```
 
-### kellerkinder.additionalVhostConfig
+### sportalliance.additionalVhostConfig
 Define additional vhost configurations that are appended to the general vhost configuration.
 
 *_Example_*
 ```
-kellerkinder.additionalVhostConfig = ''
+sportalliance.additionalVhostConfig = ''
   tls internal
 '';
 ```
 
-### kellerkinder.enableRabbitMq
+### sportalliance.enableRabbitMq
 Enables the RabbitMQ message broker and amqp PHP extension. Can be used for the Symfony message queue.
 
 *_Example_*
 ```
-kellerkinder.enableRabbitMq = true;
+sportalliance.enableRabbitMq = true;
 ```
 
-### kellerkinder.enableElasticsearch
+### sportalliance.enableElasticsearch
 Enables the Elasticsearch service and configures Shopware to use Elasticsearch in addition to the default
 MySQL search.
 
 *_Example_*
 ```
-kellerkinder.enableElasticsearch = true;
+sportalliance.enableElasticsearch = true;
 ```
 
-### kellerkinder.importDatabaseDumps
+### sportalliance.importDatabaseDumps
 
 You can import a list of links of database dumps by using the command `importdb`.
 Define a list of links like in the example below.
@@ -115,27 +115,27 @@ Supported files:
 
 *_Example_*
 ```
-kellerkinder.importDatabaseDumps = [
+sportalliance.importDatabaseDumps = [
     "http://localhost/dump.sql.gz"
     "http://localhost/admin_logins.sql"
 ];
 ```
 
-### kellerkinder.documentRoot
+### sportalliance.documentRoot
 Changes the default document root (`public`) of caddy to the specified value
 
 *_Example for the current folder_*
 ```
-kellerkinder.documentRoot = ".";
+sportalliance.documentRoot = ".";
 ```
-### kellerkinder.staticFilePaths
+### sportalliance.staticFilePaths
 Adjusts the defined matcher paths for caddy. You might want to adjust those to access/handle `*.php` files.
 
 **NOTE**: The path can not be empty!
 
 *_Example_*
 ```
-kellerkinder.staticFilePaths = "myCustomFolder/*";
+sportalliance.staticFilePaths = "myCustomFolder/*";
 ```
 
 ## Different PHP versions

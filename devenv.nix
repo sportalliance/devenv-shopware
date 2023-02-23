@@ -96,7 +96,7 @@ let
 
   importDbHelper = pkgs.writeScript "importDbHelper" ''
     if [[ "$1" == "" ]]; then
-      echo "Please set devenv configuration for kellerkinder.importDatabaseDumps"
+      echo "Please set devenv configuration for sportalliance.importDatabaseDumps"
       exit
     fi
 
