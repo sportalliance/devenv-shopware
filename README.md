@@ -7,9 +7,12 @@ tightly tailored to the needs of our team members working on various projects wi
 ## Notable Features:
 - Overrides Shopware's default mailer configuration to use [MailHog](https://github.com/mailhog/MailHog)
 - Provides helper functions to clear caches
-- Enables XDebug without a performance impact when not using it
+- Enables Xdebug without a performance impact when not using it
 - Easily configurable PHP Version
 - Inherits all default devenv features and services
+
+## Setup & Usage
+A description about the setup and usage can be found in the [Wiki](https://github.com/kellerkinderDE/devenv-shopware/wiki).
 
 ## More Information:
 - https://devenv.sh/

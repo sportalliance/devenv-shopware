@@ -58,14 +58,29 @@ let
   entryScript = pkgs.writeScript "entryScript" ''
     set -euo pipefail
 
+    if [ ! -f $DEVENV_PROFILE/bin/mysqladmin ]; then
+      echo -e "mysqladmin missing, skips further entryscript processing"
+      ${pkgs.coreutils}/bin/sleep infinity
+    fi
+
     while ! $DEVENV_PROFILE/bin/mysqladmin ping --silent; do
       ${pkgs.coreutils}/bin/sleep 1
     done
 
+    while ! [[ $($DEVENV_PROFILE/bin/mysql shopware -s -N -e 'SHOW DATABASES LIKE "shopware";') ]] ; do
+      ${pkgs.coreutils}/bin/sleep 1
+    done
+
+    TABLE=$(mysql shopware -s -N -e 'SHOW TABLES LIKE "system_config";')
+
+    if [[ $TABLE == "" ]]; then
+      echo "Table system_config is missing. Run >updateSystemConfig< manually to ensure the dev status of your setup!"
+      ${pkgs.coreutils}/bin/sleep infinity
+    fi
+
     ${scriptUpdateConfig}
 
     echo -e "Startup completed"
-
     ${pkgs.coreutils}/bin/sleep infinity
   '';
 
@@ -77,8 +92,7 @@ let
 
     echo "Updating system config"
 
-    if [ ! -f "$VENDOR" ] || [ ! -f "$CONSOLE" ];
-    then
+    if [ ! -f "$VENDOR" ] || [ ! -f "$CONSOLE" ]; then
       echo "Vendor folder or console not found. Please run composer install."
       exit 1
     fi
@@ -91,7 +105,7 @@ let
 
     # default config
     $CONSOLE system:config:set core.mailerSettings.emailAgent "" || exit 1
-    echo "System config core.mailerSettings.emailAgent set to ''''"
+    echo "System config core.mailerSettings.emailAgent set to '''"
   '';
 
   importDbHelper = pkgs.writeScript "importDbHelper" ''
@@ -224,6 +238,12 @@ in {
       default = "/theme/* /media/* /thumbnail/* /bundles/* /css/* /fonts/* /js/* /recovery/* /sitemap/*";
       description = ''Sets the matcher paths to be "ignored" by caddy'';
     };
+
+    fallbackRedirectMediaUrl = lib.mkOption {
+      type = lib.types.str;
+      default = "";
+      description = ''Fallback redirect URL for media not found on local storage. Best for CDN purposes without downloading them.'';
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -290,17 +310,31 @@ in {
 
             root * ${cfg.documentRoot}
 
-            php_fastcgi @default unix/${config.languages.php.fpm.pools.web.socket} {
-              trusted_proxies private_ranges
-            }
-
-            php_fastcgi @debugger unix/${config.languages.php.fpm.pools.xdebug.socket} {
-              trusted_proxies private_ranges
-            }
-
             encode zstd gzip
 
-            file_server
+            handle /media/* {
+              ${lib.strings.optionalString (cfg.fallbackRedirectMediaUrl != "") ''
+              @notStatic not file
+              redir @notStatic ${lib.strings.removeSuffix "/" cfg.fallbackRedirectMediaUrl}{path}
+              ''}
+              file_server
+            }
+
+            handle_errors {
+              respond "{err.status_code} {err.status_text}"
+            }
+
+            handle {
+              php_fastcgi @default unix/${config.languages.php.fpm.pools.web.socket} {
+                trusted_proxies private_ranges
+              }
+
+              php_fastcgi @debugger unix/${config.languages.php.fpm.pools.xdebug.socket} {
+                trusted_proxies private_ranges
+              }
+
+              file_server
+            }
 
             log {
               output stderr
@@ -385,10 +419,18 @@ in {
         SHOPWARE_ES_HOSTS = "127.0.0.1";
         SHOPWARE_ES_THROW_EXCEPTION = "1";
       })
+      (lib.mkIf config.services.rabbitmq.enable {
+        RABBITMQ_NODENAME = "rabbit@localhost"; # 127.0.0.1 can't be used as rabbitmq can't set short node name
+      })
     ];
 
     # Processes
     processes.entryscript.exec = "${entryScript}";
+
+    # Config related scripts
+    scripts.updateSystemConfig.exec = ''
+      ${scriptUpdateConfig}
+    '';
 
     # Symfony related scripts
     scripts.cc.exec = ''
@@ -417,8 +459,8 @@ in {
       fi
 
       ${lib.concatMapStrings (dump: ''
-        echo "Importing ${dump}"
-        ${importDbHelper} ${dump}
+         echo "Importing ${dump}"
+         ${importDbHelper} ${dump}
       '') cfg.importDatabaseDumps}
 
       ${scriptUpdateConfig}
