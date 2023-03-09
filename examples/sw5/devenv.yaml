@@ -1,12 +1,13 @@
+allowUnfree: true
 inputs:
-    sportalliance:
-        url: git+https://github.com/sportalliance/devenv-shopware
-        flake: false
-    phps:
-        url: github:fossar/nix-phps
-        inputs:
-            nixpkgs:
-                follows: nixpkgs
-imports:
+  sportalliance:
+    url: git+https://github.com/sportalliance/devenv-shopware
+    flake: false
+  phps:
+    url: github:fossar/nix-phps
+    inputs:
+      nixpkgs:
+        follows: nixpkgs
+  imports:
     - sportalliance
 

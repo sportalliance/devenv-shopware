@@ -1,3 +1,4 @@
+allowUnfree: true
 inputs:
   sportalliance:
     url: git+https://github.com/sportalliance/devenv-shopware
