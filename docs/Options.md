@@ -99,6 +99,14 @@ Changes the default document root (`public`) of caddy to the specified value
 sportalliance.documentRoot = ".";
 ```
 
+# sportalliance.projectRoot
+Changes the default root of the project to the specified value (no `/` as pre- or suffix required)
+
+*_Example for a `project` folder inside the current folder_*
+```
+sportalliance.projectRoot = "project";
+```
+
 # sportalliance.staticFilePaths
 Adjusts the defined matcher paths for caddy. You might want to adjust those to access/handle `*.php` files.
 
